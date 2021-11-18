@@ -1,0 +1,3 @@
+title=Wifi Finder
+author = James&Paul
+orientation = portrait
