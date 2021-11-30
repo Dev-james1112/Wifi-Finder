@@ -1,4 +1,5 @@
 
+from kivy_garden import mapview
 from kivy_garden.mapview import MapView, clustered_marker_layer
 from kivy_garden.mapview.view import MapMarker, MapMarkerPopup, MarkerMapLayer 
 from kivy.app import App
@@ -18,64 +19,25 @@ from kivymd.uix.button import MDFlatButton
 from kivy.core.window import Window
 from kivymd.uix.list import OneLineIconListItem
 from kivymd.app import MDApp
+from kivymd.uix.banner import MDBanner
+from kivymd.uix.bottomnavigation import MDTab,MDBottomNavigation
 from kivymd.uix.bottomsheet import MDListBottomSheet
 from kivy.utils import platform
+from kivy.clock import Clock
+from kivy_garden.mapview import MapMarkerPopup
+import sqlite3
+
 KV = '''
-<IconListItem>
-
-
-
-
-MDScreen
-
-    MDTextField:
-        id: field
-        pos_hint: {'center_x': .5, 'center_y': .6}
-        size_hint_x: None
-        width: "200dp"
-        hint_text: "Password"
-        on_focus: if self.focus: app.menu.open()
 '''
 
-class MapViewApp(MDApp):
-    def run(self):
-        if platform == 'android':
-            from android.permissions import Permission, request, permissions
-            def callback(permissions, results):
-                if all([res for res in results]):
-                    print("ok")
-                else:
-                    print('No')
-            request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION], callback)
-        if platform == 'android' or platform == 'ios':
-            from plyer import gps
-            gps.configure(on_location=self.update_blinker_position,
-            on_status=self.on_auth_status)
-            gps.start(minTime=1000, minDistance=0)
-    def updata_blinker_position(self, *args, **kwargs):
-        my_lat = kwargs['lat']
-        my_lon = kwargs["lon"]
-
-        print(my_lat, my_lon)
-    def on_auth_status(self, general_status, status_message):
-        if general_status == 'provider-enabled':
-            pass
-        else:
-            self.open_gps_access_popup()
     
-    def open_gps_acess_popup(self):
-        dialog_gps = MDDialog(title="GPS 권한 오류", text="GPS 권한을 허용해야합니다.")
-        dialog_gps.size_hint = [.8,.8]
-        dialog_gps.pos_hint = {'center_x': .5, 'center_y': .5}
-        dialog_gps.open()
-
+class MapViewApp(MDApp):
     def build(self): 
         
         box_layout = BoxLayout()
         num = 0
-
         def click(self):
-            num = btns.index(self)
+            wifi_csv = pd.read_csv("wifi.csv", encoding='cp949')
             bs = MDListBottomSheet()
             bs.add_item("[b]%s[/b]" % wifi_csv.iloc[num]['SSID'], lambda x: x)
             bs.add_item("[font=data/fonts/NanumGothic.ttf] 설치 장소명:[/font]"+
@@ -83,9 +45,8 @@ class MapViewApp(MDApp):
             bs.add_item("[font=data/fonts/NanumGothic.ttf][b] 위치:[/b][/font]"+
                     "[font=data/fonts/NanumGothic.ttf] %s[/font]" % wifi_csv.iloc[num]['loc2'], lambda x: x)
             
-            bs.add_item("[font=data/fonts/NanumGothic.ttf] 서비스 제공사[/font]"+
+            bs.add_item("[font=data/fonts/NanumGothic.ttf] 서비스 제공사:[/font]"+
                     "[font=data/fonts/NanumGothic.ttf] %s[/font]" % wifi_csv.iloc[num]['services'], lambda x: x)
-        
             bs.open()
 
 
@@ -97,25 +58,36 @@ class MapViewApp(MDApp):
         mapview.map_source = "osm"
         box_layout.add_widget(mapview)
 
-        markers = []
 
-        for i in range(len(wifi_csv.index)-25800):
-            lat = float(wifi_csv.iloc[i]['lat'])
-            lon = float(wifi_csv.iloc[i]['lon'])
+        markers = []
+        
+        for i in range(len(wifi_csv.index)):
+            lat = wifi_csv.iloc[i]['lat']
+            lon = wifi_csv.iloc[i]['lon']
+            lat = float(lat)
+            lon = float(lon)
             if lat > 0 and lon > 0:
                 marker = MapMarkerPopup(lat=lat, lon=lon,source = 'wifi_marker_image.png')
-                btns.append(Button(text=wifi_csv.iloc[i]['SSID']+"\n\n\n > 자세히 보기",font_context='system://myapp', font_name='data/fonts/NanumGothic.ttf',background_normal='normal.png',border=(30,30,30,30) ))
+                btns.append(Button(text=str(wifi_csv.iloc[i]['SSID'])+"\n\n\n > 자세히 보기",font_context='system://myapp', font_name='data/fonts/NanumGothic.ttf',background_normal='normal.png',border=(16,16,16,16) ))
+                btns[i].bind(on_press = click)
                 marker.add_widget(btns[i])
-                btns[i].bind(on_press=click)
                 mapview.add_widget(marker)
-
+                print(i)
+                num = i
+                
             else:
+                btns.append("")
+                print('불량',i,wifi_csv.iloc[i]['SSID'])
                 continue
+        print(wifi_csv.iloc[0]['lat'])
             
-            print(i)
-    
-        return box_layout
+            
         
+        return box_layout
+            
+    
 if __name__ == '__main__':
         Window.size = (375, 812)
         MapViewApp().run()
+
+
