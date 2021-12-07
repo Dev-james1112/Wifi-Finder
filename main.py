@@ -29,13 +29,13 @@ import sqlite3
 
 KV = '''
 '''
-
+num = 0
     
 class MapViewApp(MDApp):
     def build(self): 
         
         box_layout = BoxLayout()
-        num = 0
+        
         def click(self):
             wifi_csv = pd.read_csv("wifi.csv", encoding='cp949')
             bs = MDListBottomSheet()
