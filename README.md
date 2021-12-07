@@ -25,11 +25,6 @@ python -m pip install sqlite3
 
 ```
 cd (경로)
-python -m kivy (경로)
-```
-
-그다음에 cmd 창에 아래의 명령어를 입력한다. 
-```
-activate kivy
+python (경로)/main.py
 ```
 
