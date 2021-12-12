@@ -27,4 +27,4 @@ python -m pip install sqlite3
 cd (경로)
 python (경로)/main.py
 ```
-
+https://sites.google.com/view/wififinder/main
