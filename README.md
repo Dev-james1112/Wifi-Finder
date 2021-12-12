@@ -1,4 +1,4 @@
-# GGF Free Wifi
+# Free Wifi
 
 ### 다운로드
 
