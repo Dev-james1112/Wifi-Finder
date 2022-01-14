@@ -1,4 +1,4 @@
-# Free Wifi
+# Wifi Finder
 
 ### 다운로드
 
